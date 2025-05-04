@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 
 // Mock data for initial render
+// TODO: Replace with actual data from database when implemented
 const mockStats = {
   totalUsers: 156,
   totalTransactions: 1289,
@@ -21,6 +22,7 @@ const mockStats = {
   totalDebit: 38967,
 };
 
+// TODO: Fetch chart data from database in the future
 const mockChartData = [
   { name: 'Mon', credit: 4000, debit: 2400 },
   { name: 'Tue', credit: 3000, debit: 1398 },
@@ -31,6 +33,7 @@ const mockChartData = [
   { name: 'Sun', credit: 3490, debit: 4300 },
 ];
 
+// TODO: Fetch transaction data from database in the future
 const mockRecentTransactions = [
   { id: 1, userName: 'John Doe', matricNumber: 'MAT123456', cardNumber: '0xAB12CD34', type: 'credit', amount: 500, timestamp: '2023-07-20 14:30:45' },
   { id: 2, userName: 'Jane Smith', matricNumber: 'MAT654321', cardNumber: '0x12AB34CD', type: 'debit', amount: 150, timestamp: '2023-07-20 15:15:22' },
@@ -86,7 +89,7 @@ const Dashboard = () => {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // In a real app, we would set the fetched data here
+        // TODO: Replace with actual API call to fetch dashboard data
         setStats(mockStats);
         setChartData(mockChartData);
         setRecentTransactions(mockRecentTransactions);
@@ -100,8 +103,9 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
+  // Updated to use SYP instead of Naira
   const formatCurrency = (value: number) => {
-    return `₦${value.toLocaleString()}`;
+    return `SYP ${value.toLocaleString()}`;
   };
 
   return (
@@ -166,7 +170,7 @@ const Dashboard = () => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip formatter={(value) => [`SYP ${value}`, 'Amount']} />
                     <Bar dataKey="credit" fill="#38a169" name="Credit" />
                     <Bar dataKey="debit" fill="#e53e3e" name="Debit" />
                   </BarChart>
