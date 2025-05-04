@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
@@ -25,14 +26,14 @@ interface TransactionLog {
   timestamp: string;
 }
 
-// Mock data for transaction logs with proper type annotations
+// Mock data - will only be used if localStorage is empty
 const mockLogs: TransactionLog[] = [
   { 
     id: 1, 
     userName: 'John Doe', 
     matricNumber: 'MAT123456', 
     cardNumber: '0xAB12CD34', 
-    type: 'credit' as const, 
+    type: 'credit', 
     amount: 500, 
     previousBalance: 2000, 
     currentBalance: 2500, 
@@ -43,7 +44,7 @@ const mockLogs: TransactionLog[] = [
     userName: 'Jane Smith', 
     matricNumber: 'MAT654321', 
     cardNumber: '0x12AB34CD', 
-    type: 'debit' as const, 
+    type: 'debit', 
     amount: 150, 
     previousBalance: 1950, 
     currentBalance: 1800, 
@@ -148,14 +149,21 @@ const TransactionLogs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   
   useEffect(() => {
-    // In a real app, this would fetch transaction logs from an API
+    // Load transaction logs from localStorage or use mock data if not available
     const fetchLogs = async () => {
       try {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // In a real app, we would set the fetched data here
-        setLogs(mockLogs);
+        const storedLogs = localStorage.getItem('transactionLogs');
+        if (storedLogs) {
+          setLogs(JSON.parse(storedLogs));
+        } else {
+          // Initialize with mock data if localStorage is empty
+          setLogs(mockLogs);
+          // Save mock data to localStorage for first-time initialization
+          localStorage.setItem('transactionLogs', JSON.stringify(mockLogs));
+        }
       } catch (error) {
         console.error('Error fetching transaction logs:', error);
       } finally {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
@@ -6,23 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowUpRight, ArrowDownRight, Package, Candy, Cookie } from 'lucide-react';
-
-// Mock data for users
-const mockUsers = [
-  { id: 1, name: 'John Doe', matricNumber: 'MAT123456', cardNumber: '0xAB12CD34', balance: 2500 },
-  { id: 2, name: 'Jane Smith', matricNumber: 'MAT654321', cardNumber: '0x12AB34CD', balance: 1800 },
-  { id: 3, name: 'Robert Johnson', matricNumber: 'MAT789012', cardNumber: '0x56EF78GH', balance: 3200 },
-  { id: 4, name: 'Emily Davis', matricNumber: 'MAT345678', cardNumber: '0x90IJ12KL', balance: 950 },
-  { id: 5, name: 'Michael Brown', matricNumber: 'MAT901234', cardNumber: '0xMN34OP56', balance: 4100 },
-];
-
-// Products data - replacing Chips with another Cookie icon but with different name
-const products = [
-  { id: 1, name: 'Chocolate Bar', price: 500, icon: <Candy className="h-4 w-4" /> },
-  { id: 2, name: 'Chips Packet', price: 350, icon: <Cookie className="h-4 w-4" /> }, // Changed from Chips to Cookie
-  { id: 3, name: 'Donut', price: 450, icon: <Cookie className="h-4 w-4" /> },
-  { id: 4, name: 'Snack Box', price: 800, icon: <Package className="h-4 w-4" /> },
-];
 
 interface User {
   id: number;
@@ -39,6 +23,26 @@ interface Product {
   icon: JSX.Element;
 }
 
+interface TransactionLog {
+  id: number;
+  userName: string;
+  matricNumber: string;
+  cardNumber: string;
+  type: 'credit' | 'debit';
+  amount: number;
+  previousBalance: number;
+  currentBalance: number;
+  timestamp: string;
+}
+
+// Products data - replacing Chips with another Cookie icon but with different name
+const products = [
+  { id: 1, name: 'Chocolate Bar', price: 500, icon: <Candy className="h-4 w-4" /> },
+  { id: 2, name: 'Chips Packet', price: 350, icon: <Cookie className="h-4 w-4" /> }, // Changed from Chips to Cookie
+  { id: 3, name: 'Donut', price: 450, icon: <Cookie className="h-4 w-4" /> },
+  { id: 4, name: 'Snack Box', price: 800, icon: <Package className="h-4 w-4" /> },
+];
+
 const Transactions = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,14 +55,19 @@ const Transactions = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    // In a real app, this would fetch users from an API
+    // Load users from localStorage
     const fetchUsers = async () => {
       try {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // In a real app, we would set the fetched data here
-        setUsers(mockUsers);
+        const storedUsers = localStorage.getItem('appUsers');
+        if (storedUsers) {
+          setUsers(JSON.parse(storedUsers));
+        } else {
+          // If no users in localStorage, don't set any users
+          setUsers([]);
+        }
       } catch (error) {
         console.error('Error fetching users:', error);
         toast({
@@ -145,10 +154,11 @@ const Transactions = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      let newBalance = 0;
       // Update user balance locally
       const updatedUsers = users.map(user => {
         if (user.id === selectedUser.id) {
-          const newBalance = transactionType === 'credit' 
+          newBalance = transactionType === 'credit' 
             ? user.balance + amount 
             : user.balance - amount;
           
@@ -160,7 +170,27 @@ const Transactions = () => {
         return user;
       });
       
+      // Save updated users to localStorage
       setUsers(updatedUsers);
+      localStorage.setItem('appUsers', JSON.stringify(updatedUsers));
+      
+      // Create transaction log
+      const newLog: TransactionLog = {
+        id: new Date().getTime(), // Use timestamp as a unique ID
+        userName: selectedUser.name,
+        matricNumber: selectedUser.matricNumber,
+        cardNumber: selectedUser.cardNumber,
+        type: transactionType,
+        amount: amount,
+        previousBalance: selectedUser.balance,
+        currentBalance: newBalance,
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19) // Format as YYYY-MM-DD HH:MM:SS
+      };
+      
+      // Save transaction log to localStorage
+      const existingLogs: TransactionLog[] = JSON.parse(localStorage.getItem('transactionLogs') || '[]');
+      const updatedLogs = [newLog, ...existingLogs];
+      localStorage.setItem('transactionLogs', JSON.stringify(updatedLogs));
       
       let description = `Successfully processed ${transactionType} of SYP ${amount} for ${selectedUser.name}`;
       

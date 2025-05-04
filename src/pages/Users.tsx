@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useToast } from '@/components/ui/use-toast';
 import { Plus, Search } from 'lucide-react';
 
-// Mock data for initial render
+// Mock data for initial render - will only be used if localStorage is empty
 const mockUsers = [
   { id: 1, name: 'John Doe', matricNumber: 'MAT123456', cardNumber: '0xAB12CD34', balance: 2500, createdAt: '2023-05-15' },
   { id: 2, name: 'Jane Smith', matricNumber: 'MAT654321', cardNumber: '0x12AB34CD', balance: 1800, createdAt: '2023-05-20' },
@@ -41,14 +41,21 @@ const Users = () => {
   });
   
   useEffect(() => {
-    // In a real app, this would fetch users from an API
+    // Load users from localStorage or use mock data if not available
     const fetchUsers = async () => {
       try {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
-        // In a real app, we would set the fetched data here
-        setUsers(mockUsers);
+        const storedUsers = localStorage.getItem('appUsers');
+        if (storedUsers) {
+          setUsers(JSON.parse(storedUsers));
+        } else {
+          // Initialize with mock data if localStorage is empty
+          setUsers(mockUsers);
+          // Save mock data to localStorage for first-time initialization
+          localStorage.setItem('appUsers', JSON.stringify(mockUsers));
+        }
       } catch (error) {
         console.error('Error fetching users:', error);
         toast({
@@ -89,10 +96,9 @@ const Users = () => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // In a real app, this would be an API call to create a new user
-      // For demo, we'll just add to the local state
+      // Create new user
       const createdUser: User = {
-        id: users.length + 1,
+        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1, // Generate a unique ID
         name: newUser.name,
         matricNumber: newUser.matricNumber,
         cardNumber: newUser.cardNumber,
@@ -100,7 +106,10 @@ const Users = () => {
         createdAt: new Date().toISOString().split('T')[0],
       };
       
-      setUsers([...users, createdUser]);
+      // Update state and localStorage
+      const updatedUsers = [...users, createdUser];
+      setUsers(updatedUsers);
+      localStorage.setItem('appUsers', JSON.stringify(updatedUsers));
       
       // Reset form
       setNewUser({
