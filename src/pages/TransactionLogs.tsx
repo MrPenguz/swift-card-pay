@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
@@ -168,7 +167,7 @@ const TransactionLogs = () => {
   }, []);
   
   const formatCurrency = (value: number) => {
-    return `₦${value.toLocaleString()}`;
+    return `SYP ${value.toLocaleString()}`;
   };
   
   const filteredLogs = logs.filter(log => {

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Package, Candy, Cookie, Chips } from 'lucide-react';
 
 // Mock data for users
 const mockUsers = [
@@ -17,12 +17,27 @@ const mockUsers = [
   { id: 5, name: 'Michael Brown', matricNumber: 'MAT901234', cardNumber: '0xMN34OP56', balance: 4100 },
 ];
 
+// Products data
+const products = [
+  { id: 1, name: 'Chocolate Bar', price: 500, icon: <Candy className="h-4 w-4" /> },
+  { id: 2, name: 'Chips Packet', price: 350, icon: <Chips className="h-4 w-4" /> },
+  { id: 3, name: 'Donut', price: 450, icon: <Cookie className="h-4 w-4" /> },
+  { id: 4, name: 'Snack Box', price: 800, icon: <Package className="h-4 w-4" /> },
+];
+
 interface User {
   id: number;
   name: string;
   matricNumber: string;
   cardNumber: string;
   balance: number;
+}
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  icon: JSX.Element;
 }
 
 const Transactions = () => {
@@ -32,6 +47,8 @@ const Transactions = () => {
   const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
   const [amount, setAmount] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string>('');
+  const [transactionMethod, setTransactionMethod] = useState<'manual' | 'product'>('manual');
   const { toast } = useToast();
   
   useEffect(() => {
@@ -67,9 +84,31 @@ const Transactions = () => {
     }
   }, [selectedUserId, users]);
   
+  useEffect(() => {
+    if (selectedProductId && transactionMethod === 'product') {
+      const product = products.find(p => p.id === parseInt(selectedProductId, 10));
+      if (product) {
+        setAmount(product.price);
+        setTransactionType('debit'); // Products are always purchased (debit)
+      }
+    } else if (transactionMethod === 'manual') {
+      setAmount(0);
+    }
+  }, [selectedProductId, transactionMethod]);
+  
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value) || 0;
     setAmount(value);
+  };
+
+  const handleTransactionMethodChange = (value: 'manual' | 'product') => {
+    setTransactionMethod(value);
+    if (value === 'manual') {
+      setSelectedProductId('');
+      setAmount(0);
+    } else {
+      setTransactionType('debit');
+    }
   };
   
   const handleTransactionSubmit = async (e: React.FormEvent) => {
@@ -124,13 +163,29 @@ const Transactions = () => {
       
       setUsers(updatedUsers);
       
+      let description = `Successfully processed ${transactionType} of SYP ${amount} for ${selectedUser.name}`;
+      
+      if (transactionMethod === 'product' && selectedProductId) {
+        const product = products.find(p => p.id === parseInt(selectedProductId, 10));
+        if (product) {
+          description = `${selectedUser.name} purchased ${product.name} for SYP ${product.price}`;
+        }
+      }
+      
       toast({
         title: "Success",
-        description: `Successfully processed ${transactionType} of ₦${amount} for ${selectedUser.name}`,
+        description,
       });
       
-      // Reset form
-      setAmount(0);
+      // Reset form for product transactions
+      if (transactionMethod === 'product') {
+        setSelectedProductId('');
+      }
+      
+      // Reset amount for manual transactions
+      if (transactionMethod === 'manual') {
+        setAmount(0);
+      }
     } catch (error) {
       console.error('Error processing transaction:', error);
       toast({
@@ -142,7 +197,7 @@ const Transactions = () => {
   };
   
   const formatCurrency = (value: number) => {
-    return `₦${value.toLocaleString()}`;
+    return `SYP ${value.toLocaleString()}`;
   };
 
   return (
@@ -152,6 +207,26 @@ const Transactions = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="card-dashboard lg:col-span-2">
           <h2 className="section-title">Process Transaction</h2>
+          
+          <div className="mb-6">
+            <div className="flex space-x-2 mb-4">
+              <Button
+                variant={transactionMethod === 'manual' ? "default" : "outline"}
+                onClick={() => handleTransactionMethodChange('manual')}
+                className="flex-1"
+              >
+                Manual Transaction
+              </Button>
+              <Button
+                variant={transactionMethod === 'product' ? "default" : "outline"}
+                onClick={() => handleTransactionMethodChange('product')}
+                className="flex-1"
+              >
+                Purchase Product
+              </Button>
+            </div>
+          </div>
+          
           <form onSubmit={handleTransactionSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -176,39 +251,67 @@ const Transactions = () => {
                 </Select>
               </div>
               
-              <div className="space-y-2">
-                <label htmlFor="transactionType" className="text-sm font-medium">
-                  Transaction Type
-                </label>
-                <Select
-                  value={transactionType}
-                  onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="credit">Credit (Add Funds)</SelectItem>
-                    <SelectItem value="debit">Debit (Remove Funds)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {transactionMethod === 'manual' ? (
+                <div className="space-y-2">
+                  <label htmlFor="transactionType" className="text-sm font-medium">
+                    Transaction Type
+                  </label>
+                  <Select
+                    value={transactionType}
+                    onValueChange={(value) => setTransactionType(value as 'credit' | 'debit')}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="credit">Credit (Add Funds)</SelectItem>
+                      <SelectItem value="debit">Debit (Remove Funds)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <label htmlFor="product" className="text-sm font-medium">
+                    Select Product
+                  </label>
+                  <Select
+                    value={selectedProductId}
+                    onValueChange={setSelectedProductId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a product" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {products.map(product => (
+                        <SelectItem key={product.id} value={product.id.toString()}>
+                          <div className="flex items-center">
+                            <span className="mr-2">{product.icon}</span>
+                            <span>{product.name} - {formatCurrency(product.price)}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             
-            <div className="space-y-2">
-              <label htmlFor="amount" className="text-sm font-medium">
-                Amount (₦)
-              </label>
-              <Input
-                id="amount"
-                type="number"
-                min="0"
-                step="0.01"
-                value={amount || ''}
-                onChange={handleAmountChange}
-                placeholder="0.00"
-              />
-            </div>
+            {transactionMethod === 'manual' && (
+              <div className="space-y-2">
+                <label htmlFor="amount" className="text-sm font-medium">
+                  Amount (SYP)
+                </label>
+                <Input
+                  id="amount"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={amount || ''}
+                  onChange={handleAmountChange}
+                  placeholder="0"
+                />
+              </div>
+            )}
             
             <Button 
               type="submit" 
@@ -217,9 +320,14 @@ const Transactions = () => {
                   ? 'bg-green-600 hover:bg-green-700' 
                   : 'bg-red-600 hover:bg-red-700'
               }
-              disabled={!selectedUser || amount <= 0}
+              disabled={!selectedUser || amount <= 0 || (transactionMethod === 'product' && !selectedProductId)}
             >
-              {transactionType === 'credit' ? (
+              {transactionMethod === 'product' ? (
+                <>
+                  <Package size={16} className="mr-1" />
+                  Purchase Product
+                </>
+              ) : transactionType === 'credit' ? (
                 <>
                   <ArrowUpRight size={16} className="mr-1" />
                   Process Credit
@@ -289,6 +397,33 @@ const Transactions = () => {
           )}
         </Card>
       </div>
+      
+      {transactionMethod === 'product' && (
+        <Card className="card-dashboard mt-6">
+          <h2 className="section-title">Available Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            {products.map(product => (
+              <Card 
+                key={product.id} 
+                className={`p-4 cursor-pointer transition-all ${
+                  selectedProductId === product.id.toString() 
+                    ? 'ring-2 ring-blue-500 bg-blue-50' 
+                    : 'hover:bg-gray-50'
+                }`}
+                onClick={() => setSelectedProductId(product.id.toString())}
+              >
+                <div className="flex flex-col items-center">
+                  <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                    {React.cloneElement(product.icon, { className: "h-6 w-6 text-blue-600" })}
+                  </div>
+                  <h3 className="font-medium text-center">{product.name}</h3>
+                  <p className="text-blue-600 font-semibold mt-2">{formatCurrency(product.price)}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </Card>
+      )}
     </DashboardLayout>
   );
 };
