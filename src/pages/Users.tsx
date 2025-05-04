@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useToast } from '@/components/ui/use-toast';
 import { Plus, Search } from 'lucide-react';
 
+// TODO: Replace this mock data with actual database fetching when DB is implemented
 // Mock data for initial render - will only be used if localStorage is empty
 const mockUsers = [
   { id: 1, name: 'John Doe', matricNumber: 'MAT123456', cardNumber: '0xAB12CD34', balance: 2500, createdAt: '2023-05-15' },
@@ -41,12 +42,14 @@ const Users = () => {
   });
   
   useEffect(() => {
+    // TODO: Replace with API call to your database when implemented
     // Load users from localStorage or use mock data if not available
     const fetchUsers = async () => {
       try {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
+        // TODO: Replace with actual API call to your database
         const storedUsers = localStorage.getItem('appUsers');
         if (storedUsers) {
           setUsers(JSON.parse(storedUsers));
@@ -93,6 +96,7 @@ const Users = () => {
     }
     
     try {
+      // TODO: Replace with actual API call to create user in your database
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
@@ -107,6 +111,7 @@ const Users = () => {
       };
       
       // Update state and localStorage
+      // TODO: Replace localStorage with database updates
       const updatedUsers = [...users, createdUser];
       setUsers(updatedUsers);
       localStorage.setItem('appUsers', JSON.stringify(updatedUsers));
@@ -134,7 +139,7 @@ const Users = () => {
   };
   
   const formatCurrency = (value: number) => {
-    return `₦${value.toLocaleString()}`;
+    return `SYP ${value.toLocaleString()}`;
   };
   
   const filteredUsers = users.filter(user => {
@@ -203,7 +208,7 @@ const Users = () => {
               
               <div className="space-y-2">
                 <label htmlFor="initialBalance" className="text-sm font-medium">
-                  Initial Balance (₦)
+                  Initial Balance (SYP)
                 </label>
                 <Input
                   id="initialBalance"

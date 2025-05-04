@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
@@ -35,10 +34,11 @@ interface TransactionLog {
   timestamp: string;
 }
 
-// Products data - replacing Chips with another Cookie icon but with different name
+// TODO: Move products to database when implemented
+// Products data - using Cookie icon with different names
 const products = [
   { id: 1, name: 'Chocolate Bar', price: 500, icon: <Candy className="h-4 w-4" /> },
-  { id: 2, name: 'Chips Packet', price: 350, icon: <Cookie className="h-4 w-4" /> }, // Changed from Chips to Cookie
+  { id: 2, name: 'Chips Packet', price: 350, icon: <Cookie className="h-4 w-4" /> },
   { id: 3, name: 'Donut', price: 450, icon: <Cookie className="h-4 w-4" /> },
   { id: 4, name: 'Snack Box', price: 800, icon: <Package className="h-4 w-4" /> },
 ];
@@ -55,12 +55,14 @@ const Transactions = () => {
   const { toast } = useToast();
   
   useEffect(() => {
+    // TODO: Replace with API call to your database when implemented
     // Load users from localStorage
     const fetchUsers = async () => {
       try {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
+        // TODO: Replace with actual API call to fetch users from your database
         const storedUsers = localStorage.getItem('appUsers');
         if (storedUsers) {
           setUsers(JSON.parse(storedUsers));
@@ -151,11 +153,13 @@ const Transactions = () => {
     }
     
     try {
+      // TODO: Replace with actual API call to process transaction in your database
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       let newBalance = 0;
       // Update user balance locally
+      // TODO: Replace with actual API call to update user balance in your database
       const updatedUsers = users.map(user => {
         if (user.id === selectedUser.id) {
           newBalance = transactionType === 'credit' 
@@ -170,11 +174,13 @@ const Transactions = () => {
         return user;
       });
       
+      // TODO: Replace localStorage with database updates
       // Save updated users to localStorage
       setUsers(updatedUsers);
       localStorage.setItem('appUsers', JSON.stringify(updatedUsers));
       
       // Create transaction log
+      // TODO: Replace with actual API call to create transaction log in your database
       const newLog: TransactionLog = {
         id: new Date().getTime(), // Use timestamp as a unique ID
         userName: selectedUser.name,
@@ -187,6 +193,7 @@ const Transactions = () => {
         timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19) // Format as YYYY-MM-DD HH:MM:SS
       };
       
+      // TODO: Replace localStorage with database updates
       // Save transaction log to localStorage
       const existingLogs: TransactionLog[] = JSON.parse(localStorage.getItem('transactionLogs') || '[]');
       const updatedLogs = [newLog, ...existingLogs];
@@ -225,6 +232,7 @@ const Transactions = () => {
     }
   };
   
+  // Format currency to SYP format
   const formatCurrency = (value: number) => {
     return `SYP ${value.toLocaleString()}`;
   };

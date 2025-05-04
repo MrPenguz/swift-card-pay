@@ -26,6 +26,7 @@ interface TransactionLog {
   timestamp: string;
 }
 
+// TODO: Replace this mock data with actual database fetching when DB is implemented
 // Mock data - will only be used if localStorage is empty
 const mockLogs: TransactionLog[] = [
   { 
@@ -149,12 +150,14 @@ const TransactionLogs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   
   useEffect(() => {
+    // TODO: Replace with API call to your database when implemented
     // Load transaction logs from localStorage or use mock data if not available
     const fetchLogs = async () => {
       try {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
+        // TODO: Replace with actual API call to your database
         const storedLogs = localStorage.getItem('transactionLogs');
         if (storedLogs) {
           setLogs(JSON.parse(storedLogs));
@@ -174,6 +177,7 @@ const TransactionLogs = () => {
     fetchLogs();
   }, []);
   
+  // Format currency to SYP format
   const formatCurrency = (value: number) => {
     return `SYP ${value.toLocaleString()}`;
   };
