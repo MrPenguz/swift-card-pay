@@ -14,120 +14,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-// Mock data for transaction logs
-const mockLogs = [
-  { 
-    id: 1, 
-    userName: 'John Doe', 
-    matricNumber: 'MAT123456', 
-    cardNumber: '0xAB12CD34', 
-    type: 'credit', 
-    amount: 500, 
-    previousBalance: 2000, 
-    currentBalance: 2500, 
-    timestamp: '2023-07-20 14:30:45' 
-  },
-  { 
-    id: 2, 
-    userName: 'Jane Smith', 
-    matricNumber: 'MAT654321', 
-    cardNumber: '0x12AB34CD', 
-    type: 'debit', 
-    amount: 150, 
-    previousBalance: 1950, 
-    currentBalance: 1800, 
-    timestamp: '2023-07-20 15:15:22' 
-  },
-  { 
-    id: 3, 
-    userName: 'Robert Johnson', 
-    matricNumber: 'MAT789012', 
-    cardNumber: '0x56EF78GH', 
-    type: 'credit', 
-    amount: 1000, 
-    previousBalance: 2200, 
-    currentBalance: 3200, 
-    timestamp: '2023-07-20 16:05:11' 
-  },
-  { 
-    id: 4, 
-    userName: 'Emily Davis', 
-    matricNumber: 'MAT345678', 
-    cardNumber: '0x90IJ12KL', 
-    type: 'debit', 
-    amount: 75, 
-    previousBalance: 1025, 
-    currentBalance: 950, 
-    timestamp: '2023-07-20 16:45:30' 
-  },
-  { 
-    id: 5, 
-    userName: 'Michael Brown', 
-    matricNumber: 'MAT901234', 
-    cardNumber: '0xMN34OP56', 
-    type: 'credit', 
-    amount: 1500, 
-    previousBalance: 2600, 
-    currentBalance: 4100, 
-    timestamp: '2023-07-21 09:10:15' 
-  },
-  { 
-    id: 6, 
-    userName: 'Sarah Wilson', 
-    matricNumber: 'MAT567890', 
-    cardNumber: '0xQR78ST90', 
-    type: 'debit', 
-    amount: 230, 
-    previousBalance: 1730, 
-    currentBalance: 1500, 
-    timestamp: '2023-07-21 10:25:40' 
-  },
-  { 
-    id: 7, 
-    userName: 'David Thompson', 
-    matricNumber: 'MAT234567', 
-    cardNumber: '0xUV12WX34', 
-    type: 'credit', 
-    amount: 800, 
-    previousBalance: 1200, 
-    currentBalance: 2000, 
-    timestamp: '2023-07-21 11:45:05' 
-  },
-  { 
-    id: 8, 
-    userName: 'Lisa Martinez', 
-    matricNumber: 'MAT890123', 
-    cardNumber: '0xYZ56AB78', 
-    type: 'debit', 
-    amount: 450, 
-    previousBalance: 2450, 
-    currentBalance: 2000, 
-    timestamp: '2023-07-21 13:30:20' 
-  },
-  { 
-    id: 9, 
-    userName: 'James Anderson', 
-    matricNumber: 'MAT456789', 
-    cardNumber: '0xCD90EF12', 
-    type: 'credit', 
-    amount: 1200, 
-    previousBalance: 800, 
-    currentBalance: 2000, 
-    timestamp: '2023-07-21 14:55:35' 
-  },
-  { 
-    id: 10, 
-    userName: 'Jennifer Taylor', 
-    matricNumber: 'MAT012345', 
-    cardNumber: '0xGH34IJ56', 
-    type: 'debit', 
-    amount: 320, 
-    previousBalance: 1820, 
-    currentBalance: 1500, 
-    timestamp: '2023-07-21 16:15:50' 
-  },
-];
-
 interface TransactionLog {
   id: number;
   userName: string;
@@ -139,6 +25,120 @@ interface TransactionLog {
   currentBalance: number;
   timestamp: string;
 }
+
+// Mock data for transaction logs with proper type annotations
+const mockLogs: TransactionLog[] = [
+  { 
+    id: 1, 
+    userName: 'John Doe', 
+    matricNumber: 'MAT123456', 
+    cardNumber: '0xAB12CD34', 
+    type: 'credit' as const, 
+    amount: 500, 
+    previousBalance: 2000, 
+    currentBalance: 2500, 
+    timestamp: '2023-07-20 14:30:45' 
+  },
+  { 
+    id: 2, 
+    userName: 'Jane Smith', 
+    matricNumber: 'MAT654321', 
+    cardNumber: '0x12AB34CD', 
+    type: 'debit' as const, 
+    amount: 150, 
+    previousBalance: 1950, 
+    currentBalance: 1800, 
+    timestamp: '2023-07-20 15:15:22' 
+  },
+  { 
+    id: 3, 
+    userName: 'Robert Johnson', 
+    matricNumber: 'MAT789012', 
+    cardNumber: '0x56EF78GH', 
+    type: 'credit' as const, 
+    amount: 1000, 
+    previousBalance: 2200, 
+    currentBalance: 3200, 
+    timestamp: '2023-07-20 16:05:11' 
+  },
+  { 
+    id: 4, 
+    userName: 'Emily Davis', 
+    matricNumber: 'MAT345678', 
+    cardNumber: '0x90IJ12KL', 
+    type: 'debit' as const, 
+    amount: 75, 
+    previousBalance: 1025, 
+    currentBalance: 950, 
+    timestamp: '2023-07-20 16:45:30' 
+  },
+  { 
+    id: 5, 
+    userName: 'Michael Brown', 
+    matricNumber: 'MAT901234', 
+    cardNumber: '0xMN34OP56', 
+    type: 'credit' as const, 
+    amount: 1500, 
+    previousBalance: 2600, 
+    currentBalance: 4100, 
+    timestamp: '2023-07-21 09:10:15' 
+  },
+  { 
+    id: 6, 
+    userName: 'Sarah Wilson', 
+    matricNumber: 'MAT567890', 
+    cardNumber: '0xQR78ST90', 
+    type: 'debit' as const, 
+    amount: 230, 
+    previousBalance: 1730, 
+    currentBalance: 1500, 
+    timestamp: '2023-07-21 10:25:40' 
+  },
+  { 
+    id: 7, 
+    userName: 'David Thompson', 
+    matricNumber: 'MAT234567', 
+    cardNumber: '0xUV12WX34', 
+    type: 'credit' as const, 
+    amount: 800, 
+    previousBalance: 1200, 
+    currentBalance: 2000, 
+    timestamp: '2023-07-21 11:45:05' 
+  },
+  { 
+    id: 8, 
+    userName: 'Lisa Martinez', 
+    matricNumber: 'MAT890123', 
+    cardNumber: '0xYZ56AB78', 
+    type: 'debit' as const, 
+    amount: 450, 
+    previousBalance: 2450, 
+    currentBalance: 2000, 
+    timestamp: '2023-07-21 13:30:20' 
+  },
+  { 
+    id: 9, 
+    userName: 'James Anderson', 
+    matricNumber: 'MAT456789', 
+    cardNumber: '0xCD90EF12', 
+    type: 'credit' as const, 
+    amount: 1200, 
+    previousBalance: 800, 
+    currentBalance: 2000, 
+    timestamp: '2023-07-21 14:55:35' 
+  },
+  { 
+    id: 10, 
+    userName: 'Jennifer Taylor', 
+    matricNumber: 'MAT012345', 
+    cardNumber: '0xGH34IJ56', 
+    type: 'debit' as const, 
+    amount: 320, 
+    previousBalance: 1820, 
+    currentBalance: 1500, 
+    timestamp: '2023-07-21 16:15:50' 
+  },
+];
 
 const ITEMS_PER_PAGE = 5;
 
