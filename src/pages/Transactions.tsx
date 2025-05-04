@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowUpRight, ArrowDownRight, Package, Candy, Cookie, Chips } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Package, Candy, Cookie } from 'lucide-react';
 
 // Mock data for users
 const mockUsers = [
@@ -17,10 +16,10 @@ const mockUsers = [
   { id: 5, name: 'Michael Brown', matricNumber: 'MAT901234', cardNumber: '0xMN34OP56', balance: 4100 },
 ];
 
-// Products data
+// Products data - replacing Chips with another Cookie icon but with different name
 const products = [
   { id: 1, name: 'Chocolate Bar', price: 500, icon: <Candy className="h-4 w-4" /> },
-  { id: 2, name: 'Chips Packet', price: 350, icon: <Chips className="h-4 w-4" /> },
+  { id: 2, name: 'Chips Packet', price: 350, icon: <Cookie className="h-4 w-4" /> }, // Changed from Chips to Cookie
   { id: 3, name: 'Donut', price: 450, icon: <Cookie className="h-4 w-4" /> },
   { id: 4, name: 'Snack Box', price: 800, icon: <Package className="h-4 w-4" /> },
 ];
