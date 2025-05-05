@@ -5,14 +5,70 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { CreditCard, Lock } from 'lucide-react';
+import { CreditCard, Lock, Language } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+
+// TODO: Move these translations to a separate file when implementing a proper i18n solution
+const translations = {
+  en: {
+    title: 'Swift Card Pay',
+    subtitle: 'NFC Card Payment System',
+    username: 'Username',
+    password: 'Password',
+    loginButton: 'Login',
+    loggingIn: 'Logging in...',
+    demoCredentials: 'Demo credentials: admin / admin',
+    errorRequired: 'Username and password are required',
+    loginSuccess: 'Login successful',
+    welcomeMessage: 'Welcome to Swift Card Pay',
+    loginFailed: 'Login failed',
+    invalidCredentials: 'Invalid username or password',
+    loginError: 'Login error',
+    unexpectedError: 'An unexpected error occurred',
+  },
+  ar: {
+    title: 'سويفت كارد باي',
+    subtitle: 'نظام الدفع ببطاقة NFC',
+    username: 'اسم المستخدم',
+    password: 'كلمة المرور',
+    loginButton: 'تسجيل الدخول',
+    loggingIn: 'جاري تسجيل الدخول...',
+    demoCredentials: 'بيانات تجريبية: admin / admin',
+    errorRequired: 'اسم المستخدم وكلمة المرور مطلوبان',
+    loginSuccess: 'تم تسجيل الدخول بنجاح',
+    welcomeMessage: 'مرحبًا بك في سويفت كارد باي',
+    loginFailed: 'فشل تسجيل الدخول',
+    invalidCredentials: 'اسم المستخدم أو كلمة المرور غير صالحة',
+    loginError: 'خطأ في تسجيل الدخول',
+    unexpectedError: 'حدث خطأ غير متوقع',
+  }
+};
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Get translations for current language
+  const t = translations[language];
+
+  // Set document direction based on language
+  React.useEffect(() => {
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    // Store language preference in localStorage
+    localStorage.setItem('preferredLanguage', language);
+  }, [language]);
+
+  // Load language preference on mount
+  React.useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage') as 'en' | 'ar';
+    if (savedLanguage) {
+      setLanguage(savedLanguage);
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +77,7 @@ const Login = () => {
     if (!username || !password) {
       toast({
         title: "Error",
-        description: "Username and password are required",
+        description: t.errorRequired,
         variant: "destructive",
       });
       return;
@@ -29,30 +85,56 @@ const Login = () => {
     
     setIsLoading(true);
     
-    // In a real application, this would be an API call to authenticate
-    // For demo purposes, we'll simulate a successful login with admin/admin
+    // TODO: Replace this with actual authentication when database is implemented
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (username === 'admin' && password === 'admin') {
         toast({
-          title: "Login successful",
-          description: "Welcome to Swift Card Pay",
+          title: t.loginSuccess,
+          description: t.welcomeMessage,
         });
-        // In a real app, we would store auth token here
+        // TODO: Store user info and auth token when implementing actual authentication
+        localStorage.setItem('currentUser', JSON.stringify({ 
+          username: 'admin', 
+          role: 'admin',
+          isAuthenticated: true 
+        }));
         navigate('/dashboard');
       } else {
-        toast({
-          title: "Login failed",
-          description: "Invalid username or password",
-          variant: "destructive",
-        });
+        // TODO: Check if user exists in the database when implemented
+        // Check if this is a regular user login
+        const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
+        const user = users.find((u: any) => u.matricNumber === username && username === password);
+        
+        if (user) {
+          toast({
+            title: t.loginSuccess,
+            description: t.welcomeMessage,
+          });
+          // Store user info for user-specific views
+          localStorage.setItem('currentUser', JSON.stringify({ 
+            username: user.matricNumber,
+            name: user.name,
+            userId: user.id,
+            role: 'user',
+            isAuthenticated: true 
+          }));
+          // Redirect to user-specific transaction logs
+          navigate('/logs');
+        } else {
+          toast({
+            title: t.loginFailed,
+            description: t.invalidCredentials,
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       toast({
-        title: "Login error",
-        description: "An unexpected error occurred",
+        title: t.loginError,
+        description: t.unexpectedError,
         variant: "destructive",
       });
     } finally {
@@ -61,20 +143,40 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <Card className="w-full max-w-md p-8">
         <div className="text-center mb-8">
           <div className="flex justify-center">
             <CreditCard className="h-12 w-12 text-nfc-blue" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold text-nfc-blue">Swift Card Pay</h1>
-          <p className="mt-2 text-gray-500">NFC Card Payment System</p>
+          <h1 className="mt-4 text-2xl font-bold text-nfc-blue">{t.title}</h1>
+          <p className="mt-2 text-gray-500">{t.subtitle}</p>
+          
+          {/* Language selector */}
+          <div className="absolute top-4 right-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Language className="h-4 w-4 mr-2" />
+                  {language === 'en' ? 'English' : 'العربية'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setLanguage('en')}>
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                  العربية
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="username" className="text-sm font-medium">
-              Username
+              {t.username}
             </label>
             <div className="relative">
               <Input
@@ -83,7 +185,7 @@ const Login = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="pl-10"
-                placeholder="Enter your username"
+                placeholder={t.username}
                 disabled={isLoading}
               />
               <div className="absolute left-3 top-2.5 text-gray-400">
@@ -94,7 +196,7 @@ const Login = () => {
           
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              Password
+              {t.password}
             </label>
             <div className="relative">
               <Input
@@ -103,7 +205,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10"
-                placeholder="Enter your password"
+                placeholder={t.password}
                 disabled={isLoading}
               />
               <div className="absolute left-3 top-2.5 text-gray-400">
@@ -117,12 +219,12 @@ const Login = () => {
             className="w-full bg-nfc-blue hover:bg-blue-800" 
             disabled={isLoading}
           >
-            {isLoading ? "Logging in..." : "Login"}
+            {isLoading ? t.loggingIn : t.loginButton}
           </Button>
         </form>
         
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Demo credentials: admin / admin</p>
+          <p>{t.demoCredentials}</p>
         </div>
       </Card>
     </div>

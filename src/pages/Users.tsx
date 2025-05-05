@@ -37,8 +37,9 @@ const Users = () => {
   const [newUser, setNewUser] = useState({
     name: '',
     matricNumber: '',
-    cardNumber: '',
+    cardNumber: '', // TODO: Integrate with RFID reader to populate this field automatically
     initialBalance: 0,
+    password: '', // Added for user login capabilities
   });
   
   useEffect(() => {
@@ -105,7 +106,7 @@ const Users = () => {
         id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1, // Generate a unique ID
         name: newUser.name,
         matricNumber: newUser.matricNumber,
-        cardNumber: newUser.cardNumber,
+        cardNumber: newUser.cardNumber, // TODO: In production, this will come from RFID reader
         balance: newUser.initialBalance,
         createdAt: new Date().toISOString().split('T')[0],
       };
@@ -122,6 +123,7 @@ const Users = () => {
         matricNumber: '',
         cardNumber: '',
         initialBalance: 0,
+        password: '',
       });
       
       toast({
@@ -193,6 +195,7 @@ const Users = () => {
                 />
               </div>
               
+              {/* TODO: In production, integrate with RFID reader to automatically populate this field */}
               <div className="space-y-2">
                 <label htmlFor="cardNumber" className="text-sm font-medium">
                   Card Number
@@ -204,6 +207,24 @@ const Users = () => {
                   onChange={handleNewUserChange}
                   placeholder="e.g., 0xAB12CD34"
                 />
+              </div>
+              
+              {/* Added password field for user login */}
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={newUser.password}
+                  onChange={handleNewUserChange}
+                  placeholder="Set user password"
+                />
+                <p className="text-xs text-gray-500">
+                  Note: By default, password will be same as matric number if left empty
+                </p>
               </div>
               
               <div className="space-y-2">
