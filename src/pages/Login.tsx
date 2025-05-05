@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { CreditCard, Lock, Languages } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 // TODO: Move these translations to a separate file when implementing a proper i18n solution
 const translations = {
@@ -25,6 +26,8 @@ const translations = {
     invalidCredentials: 'Invalid username or password',
     loginError: 'Login error',
     unexpectedError: 'An unexpected error occurred',
+    english: 'English',
+    arabic: 'العربية',
   },
   ar: {
     title: 'سويفت كارد باي',
@@ -41,6 +44,8 @@ const translations = {
     invalidCredentials: 'اسم المستخدم أو كلمة المرور غير صالحة',
     loginError: 'خطأ في تسجيل الدخول',
     unexpectedError: 'حدث خطأ غير متوقع',
+    english: 'English',
+    arabic: 'العربية',
   }
 };
 
@@ -69,6 +74,10 @@ const Login = () => {
       setLanguage(savedLanguage);
     }
   }, []);
+
+  const handleLanguageToggle = () => {
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,24 +161,19 @@ const Login = () => {
           <h1 className="mt-4 text-2xl font-bold text-nfc-blue">{t.title}</h1>
           <p className="mt-2 text-gray-500">{t.subtitle}</p>
           
-          {/* Language selector */}
-          <div className="absolute top-4 right-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Languages className="h-4 w-4 mr-2" />
-                  {language === 'en' ? 'English' : 'العربية'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setLanguage('en')}>
-                  English
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('ar')}>
-                  العربية
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          {/* Language toggle switch */}
+          <div className="absolute top-4 right-4 flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="language-toggle" className="text-sm">
+                {language === 'en' ? t.english : t.arabic}
+              </Label>
+              <Switch
+                id="language-toggle"
+                checked={language === 'ar'}
+                onCheckedChange={handleLanguageToggle}
+              />
+              <Languages className="h-4 w-4 text-gray-500" />
+            </div>
           </div>
         </div>
         

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LogOut, 
   Home, 
@@ -7,11 +7,14 @@ import {
   CreditCard, 
   Calendar,
   Menu,
-  X
+  X,
+  Languages
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface SidebarLinkProps {
   to: string;
@@ -37,11 +40,55 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
+const translations = {
+  en: {
+    dashboard: 'Dashboard',
+    users: 'User Management',
+    transactions: 'Transactions',
+    logs: 'Transaction Logs',
+    logout: 'Logout',
+    english: 'English',
+    arabic: 'العربية'
+  },
+  ar: {
+    dashboard: 'لوحة التحكم',
+    users: 'إدارة المستخدمين',
+    transactions: 'المعاملات',
+    logs: 'سجلات المعاملات',
+    logout: 'تسجيل الخروج',
+    english: 'English',
+    arabic: 'العربية'
+  }
+};
+
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Get translations for current language
+  const t = translations[language];
+  
+  // Load language preference on mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage') as 'en' | 'ar';
+    if (savedLanguage) {
+      setLanguage(savedLanguage);
+    }
+  }, []);
+  
+  // Set document direction based on language
+  useEffect(() => {
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    // Store language preference in localStorage
+    localStorage.setItem('preferredLanguage', language);
+  }, [language]);
+  
+  const handleLanguageToggle = () => {
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  };
   
   const handleLogout = () => {
     // In a real application, this would perform actual logout logic
@@ -57,7 +104,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Mobile menu toggle */}
       <button 
         className="md:hidden fixed top-4 right-4 z-50 bg-white p-2 rounded-md shadow-md"
@@ -87,38 +134,53 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <SidebarLink 
               to="/dashboard" 
               icon={Home} 
-              label="Dashboard" 
+              label={t.dashboard}
               isActive={location.pathname === '/dashboard'} 
             />
             <SidebarLink 
               to="/users" 
               icon={Users} 
-              label="User Management" 
+              label={t.users}
               isActive={location.pathname === '/users'} 
             />
             <SidebarLink 
               to="/transactions" 
               icon={CreditCard} 
-              label="Transactions" 
+              label={t.transactions} 
               isActive={location.pathname === '/transactions'} 
             />
             <SidebarLink 
               to="/logs" 
               icon={Calendar} 
-              label="Transaction Logs" 
+              label={t.logs} 
               isActive={location.pathname === '/logs'} 
             />
           </div>
         </nav>
         
+        {/* Language toggle */}
+        <div className="p-4 border-t border-b flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Languages size={18} />
+            <Label htmlFor="dashboard-language-toggle" className="text-sm">
+              {language === 'en' ? t.english : t.arabic}
+            </Label>
+          </div>
+          <Switch
+            id="dashboard-language-toggle"
+            checked={language === 'ar'}
+            onCheckedChange={handleLanguageToggle}
+          />
+        </div>
+        
         {/* Logout button */}
-        <div className="p-4 border-t">
+        <div className="p-4">
           <button 
             onClick={handleLogout}
             className="flex items-center gap-2 w-full px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
           >
             <LogOut size={18} />
-            <span>Logout</span>
+            <span>{t.logout}</span>
           </button>
         </div>
       </aside>
