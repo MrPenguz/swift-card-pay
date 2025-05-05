@@ -12,9 +12,9 @@ import {
   Tooltip, 
   ResponsiveContainer 
 } from 'recharts';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock data for initial render
-// TODO: Replace with actual data from database when implemented
 const mockStats = {
   totalUsers: 156,
   totalTransactions: 1289,
@@ -81,6 +81,7 @@ const Dashboard = () => {
   const [chartData, setChartData] = useState(mockChartData);
   const [recentTransactions, setRecentTransactions] = useState(mockRecentTransactions);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useLanguage();
   
   useEffect(() => {
     // In a real app, this would fetch data from an API
@@ -110,7 +111,7 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-6 text-nfc-blue">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6 text-nfc-blue">{t.dashboardTitle}</h1>
       
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -124,28 +125,28 @@ const Dashboard = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <DashboardCard 
-              title="Total Users" 
+              title={t.totalUsers} 
               value={stats.totalUsers} 
               icon={Users} 
               trend="up"
               color="bg-blue-500" 
             />
             <DashboardCard 
-              title="Total Transactions" 
+              title={t.totalTransactions} 
               value={stats.totalTransactions} 
               icon={CreditCard} 
               trend="up" 
               color="bg-purple-500"
             />
             <DashboardCard 
-              title="Total Credit" 
+              title={t.totalCredit} 
               value={formatCurrency(stats.totalCredit)} 
               icon={ArrowUpRight} 
               trend="up" 
               color="bg-green-500"
             />
             <DashboardCard 
-              title="Total Debit" 
+              title={t.totalDebit} 
               value={formatCurrency(stats.totalDebit)} 
               icon={ArrowDownRight} 
               trend="down" 
@@ -155,7 +156,7 @@ const Dashboard = () => {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <Card className="card-dashboard lg:col-span-2">
-              <h2 className="section-title">Weekly Transaction Summary</h2>
+              <h2 className="section-title">{t.weeklySummary}</h2>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
@@ -171,30 +172,30 @@ const Dashboard = () => {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip formatter={(value) => [`SYP ${value}`, 'Amount']} />
-                    <Bar dataKey="credit" fill="#38a169" name="Credit" />
-                    <Bar dataKey="debit" fill="#e53e3e" name="Debit" />
+                    <Bar dataKey="credit" fill="#38a169" name={t.credit} />
+                    <Bar dataKey="debit" fill="#e53e3e" name={t.debit} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </Card>
             
             <Card className="card-dashboard">
-              <h2 className="section-title">Quick Stats</h2>
+              <h2 className="section-title">{t.quickStats}</h2>
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-500">Balance in System</p>
+                  <p className="text-sm text-gray-500">{t.balanceSystem}</p>
                   <p className="text-xl font-semibold">{formatCurrency(stats.totalCredit - stats.totalDebit)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Transactions Today</p>
+                  <p className="text-sm text-gray-500">{t.transactionsToday}</p>
                   <p className="text-xl font-semibold">57</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Active Cards</p>
+                  <p className="text-sm text-gray-500">{t.activeCards}</p>
                   <p className="text-xl font-semibold">142</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">System Uptime</p>
+                  <p className="text-sm text-gray-500">{t.systemUptime}</p>
                   <p className="text-xl font-semibold">99.9%</p>
                 </div>
               </div>
@@ -202,18 +203,18 @@ const Dashboard = () => {
           </div>
           
           <Card className="card-dashboard">
-            <h2 className="section-title">Recent Transactions</h2>
+            <h2 className="section-title">{t.recentTransactions}</h2>
             <div className="overflow-x-auto">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>User</th>
-                    <th>Matric Number</th>
-                    <th>Card Number</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Timestamp</th>
+                    <th>{t.id}</th>
+                    <th>{t.user}</th>
+                    <th>{t.matricNumber}</th>
+                    <th>{t.cardNumber}</th>
+                    <th>{t.type}</th>
+                    <th>{t.amount}</th>
+                    <th>{t.timestamp}</th>
                   </tr>
                 </thead>
                 <tbody>

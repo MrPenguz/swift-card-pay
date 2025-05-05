@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   LogOut, 
   Home, 
@@ -15,6 +15,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SidebarLinkProps {
   to: string;
@@ -40,51 +41,12 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const translations = {
-  en: {
-    dashboard: 'Dashboard',
-    users: 'User Management',
-    transactions: 'Transactions',
-    logs: 'Transaction Logs',
-    logout: 'Logout',
-    english: 'English',
-    arabic: 'العربية'
-  },
-  ar: {
-    dashboard: 'لوحة التحكم',
-    users: 'إدارة المستخدمين',
-    transactions: 'المعاملات',
-    logs: 'سجلات المعاملات',
-    logout: 'تسجيل الخروج',
-    english: 'English',
-    arabic: 'العربية'
-  }
-};
-
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'ar'>('en');
+  const { language, setLanguage, t } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Get translations for current language
-  const t = translations[language];
-  
-  // Load language preference on mount
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('preferredLanguage') as 'en' | 'ar';
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
-    }
-  }, []);
-  
-  // Set document direction based on language
-  useEffect(() => {
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-    // Store language preference in localStorage
-    localStorage.setItem('preferredLanguage', language);
-  }, [language]);
   
   const handleLanguageToggle = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
@@ -104,7 +66,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
       {/* Mobile menu toggle */}
       <button 
         className="md:hidden fixed top-4 right-4 z-50 bg-white p-2 rounded-md shadow-md"
@@ -158,19 +120,21 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </div>
         </nav>
         
-        {/* Language toggle */}
-        <div className="p-4 border-t border-b flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Languages size={18} />
-            <Label htmlFor="dashboard-language-toggle" className="text-sm">
-              {language === 'en' ? t.english : t.arabic}
-            </Label>
+        {/* Language toggle - fixed styling */}
+        <div className="p-4 border-t border-b">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Languages size={18} />
+              <Label htmlFor="dashboard-language-toggle" className="text-sm whitespace-nowrap">
+                {language === 'en' ? t.english : t.arabic}
+              </Label>
+            </div>
+            <Switch
+              id="dashboard-language-toggle"
+              checked={language === 'ar'}
+              onCheckedChange={handleLanguageToggle}
+            />
           </div>
-          <Switch
-            id="dashboard-language-toggle"
-            checked={language === 'ar'}
-            onCheckedChange={handleLanguageToggle}
-          />
         </div>
         
         {/* Logout button */}

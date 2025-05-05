@@ -8,9 +8,10 @@ import { useToast } from '@/components/ui/use-toast';
 import { CreditCard, Lock, Languages } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-// TODO: Move these translations to a separate file when implementing a proper i18n solution
-const translations = {
+// Login page specific translations
+const loginTranslations = {
   en: {
     title: 'Swift Card Pay',
     subtitle: 'NFC Card Payment System',
@@ -26,8 +27,6 @@ const translations = {
     invalidCredentials: 'Invalid username or password',
     loginError: 'Login error',
     unexpectedError: 'An unexpected error occurred',
-    english: 'English',
-    arabic: 'العربية',
   },
   ar: {
     title: 'سويفت كارد باي',
@@ -44,8 +43,6 @@ const translations = {
     invalidCredentials: 'اسم المستخدم أو كلمة المرور غير صالحة',
     loginError: 'خطأ في تسجيل الدخول',
     unexpectedError: 'حدث خطأ غير متوقع',
-    english: 'English',
-    arabic: 'العربية',
   }
 };
 
@@ -53,27 +50,12 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'ar'>('en');
+  const { language, setLanguage, t: globalT } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  // Get translations for current language
-  const t = translations[language];
-
-  // Set document direction based on language
-  React.useEffect(() => {
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-    // Store language preference in localStorage
-    localStorage.setItem('preferredLanguage', language);
-  }, [language]);
-
-  // Load language preference on mount
-  React.useEffect(() => {
-    const savedLanguage = localStorage.getItem('preferredLanguage') as 'en' | 'ar';
-    if (savedLanguage) {
-      setLanguage(savedLanguage);
-    }
-  }, []);
+  // Get login-specific translations + global translations
+  const t = { ...globalT, ...loginTranslations[language] };
 
   const handleLanguageToggle = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
@@ -94,7 +76,6 @@ const Login = () => {
     
     setIsLoading(true);
     
-    // TODO: Replace this with actual authentication when database is implemented
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -104,7 +85,6 @@ const Login = () => {
           title: t.loginSuccess,
           description: t.welcomeMessage,
         });
-        // TODO: Store user info and auth token when implementing actual authentication
         localStorage.setItem('currentUser', JSON.stringify({ 
           username: 'admin', 
           role: 'admin',
@@ -112,7 +92,6 @@ const Login = () => {
         }));
         navigate('/dashboard');
       } else {
-        // TODO: Check if user exists in the database when implemented
         // Check if this is a regular user login
         const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
         const user = users.find((u: any) => u.matricNumber === username && username === password);
@@ -122,7 +101,6 @@ const Login = () => {
             title: t.loginSuccess,
             description: t.welcomeMessage,
           });
-          // Store user info for user-specific views
           localStorage.setItem('currentUser', JSON.stringify({ 
             username: user.matricNumber,
             name: user.name,
@@ -130,7 +108,6 @@ const Login = () => {
             role: 'user',
             isAuthenticated: true 
           }));
-          // Redirect to user-specific transaction logs
           navigate('/logs');
         } else {
           toast({
@@ -152,7 +129,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md p-8">
         <div className="text-center mb-8">
           <div className="flex justify-center">
@@ -161,10 +138,10 @@ const Login = () => {
           <h1 className="mt-4 text-2xl font-bold text-nfc-blue">{t.title}</h1>
           <p className="mt-2 text-gray-500">{t.subtitle}</p>
           
-          {/* Language toggle switch */}
-          <div className="absolute top-4 right-4 flex items-center space-x-2">
+          {/* Language toggle switch - fixed styling */}
+          <div className="absolute top-4 right-4">
             <div className="flex items-center space-x-2">
-              <Label htmlFor="language-toggle" className="text-sm">
+              <Label htmlFor="language-toggle" className="text-sm whitespace-nowrap">
                 {language === 'en' ? t.english : t.arabic}
               </Label>
               <Switch
