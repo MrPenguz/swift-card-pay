@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { CreditCard, Lock, Language } from 'lucide-react';
+import { CreditCard, Lock, Languages } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 // TODO: Move these translations to a separate file when implementing a proper i18n solution
@@ -157,7 +157,7 @@ const Login = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm">
-                  <Language className="h-4 w-4 mr-2" />
+                  <Languages className="h-4 w-4 mr-2" />
                   {language === 'en' ? 'English' : 'العربية'}
                 </Button>
               </DropdownMenuTrigger>
