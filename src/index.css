@@ -93,6 +93,17 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  /* RTL support for spacing utilities */
+  [dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
+  }
+  
+  [dir="rtl"] .ml-2,
+  [dir="rtl"] .mr-2 {
+    margin-right: 0.5rem;
+    margin-left: 0;
+  }
 }
 
 @layer components {
@@ -109,7 +120,7 @@
   }
   
   .data-table th {
-    @apply bg-muted text-left p-3;
+    @apply bg-muted text-left p-3 rtl:text-right;
   }
   
   .data-table td {
@@ -118,5 +129,10 @@
   
   .data-table tr:hover {
     @apply bg-gray-50;
+  }
+  
+  /* Add RTL specific utility */
+  .rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 1;
   }
 }

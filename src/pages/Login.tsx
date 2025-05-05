@@ -142,7 +142,7 @@ const Login = () => {
           <div className="absolute top-4 right-4">
             <div className="flex items-center space-x-2">
               <Label htmlFor="language-toggle" className="text-sm whitespace-nowrap">
-                {language === 'en' ? t.english : t.arabic}
+                {language === 'en' ? globalT.english : globalT.arabic}
               </Label>
               <Switch
                 id="language-toggle"

@@ -120,10 +120,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </div>
         </nav>
         
-        {/* Language toggle - fixed styling */}
+        {/* Language toggle - improved styling for RTL/LTR compatibility */}
         <div className="p-4 border-t border-b">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
               <Languages size={18} />
               <Label htmlFor="dashboard-language-toggle" className="text-sm whitespace-nowrap">
                 {language === 'en' ? t.english : t.arabic}
