@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
@@ -6,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { ArrowUpRight, ArrowDownRight, Package, Candy, Cookie } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface User {
   id: number;
@@ -44,6 +46,7 @@ const products = [
 ];
 
 const Transactions = () => {
+  const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
@@ -74,7 +77,7 @@ const Transactions = () => {
         console.error('Error fetching users:', error);
         toast({
           title: "Error",
-          description: "Failed to load users",
+          description: t.failedToLoadUsers,
           variant: "destructive",
         });
       } finally {
@@ -83,7 +86,7 @@ const Transactions = () => {
     };
     
     fetchUsers();
-  }, [toast]);
+  }, [toast, t]);
   
   useEffect(() => {
     if (selectedUserId) {
@@ -128,7 +131,7 @@ const Transactions = () => {
     if (!selectedUser) {
       toast({
         title: "Error",
-        description: "Please select a user",
+        description: t.pleaseSelectUser,
         variant: "destructive",
       });
       return;
@@ -137,7 +140,7 @@ const Transactions = () => {
     if (amount <= 0) {
       toast({
         title: "Error",
-        description: "Amount must be greater than zero",
+        description: t.amountGreaterThanZero,
         variant: "destructive",
       });
       return;
@@ -146,7 +149,7 @@ const Transactions = () => {
     if (transactionType === 'debit' && selectedUser.balance < amount) {
       toast({
         title: "Error",
-        description: "Insufficient balance for debit",
+        description: t.insufficientBalance,
         variant: "destructive",
       });
       return;
@@ -209,7 +212,7 @@ const Transactions = () => {
       }
       
       toast({
-        title: "Success",
+        title: t.transactionSuccess,
         description,
       });
       
@@ -226,7 +229,7 @@ const Transactions = () => {
       console.error('Error processing transaction:', error);
       toast({
         title: "Error",
-        description: "Failed to process transaction",
+        description: t.failedToProcessTransaction,
         variant: "destructive",
       });
     }
@@ -239,11 +242,11 @@ const Transactions = () => {
 
   return (
     <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-6 text-nfc-blue">Transactions</h1>
+      <h1 className="text-3xl font-bold mb-6 text-nfc-blue">{t.transactionsTitle}</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="card-dashboard lg:col-span-2">
-          <h2 className="section-title">Process Transaction</h2>
+          <h2 className="section-title">{t.processTransaction}</h2>
           
           <div className="mb-6">
             <div className="flex space-x-2 mb-4">
@@ -252,14 +255,14 @@ const Transactions = () => {
                 onClick={() => handleTransactionMethodChange('manual')}
                 className="flex-1"
               >
-                Manual Transaction
+                {t.manualTransaction}
               </Button>
               <Button
                 variant={transactionMethod === 'product' ? "default" : "outline"}
                 onClick={() => handleTransactionMethodChange('product')}
                 className="flex-1"
               >
-                Purchase Product
+                {t.purchaseProduct}
               </Button>
             </div>
           </div>
@@ -268,7 +271,7 @@ const Transactions = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="user" className="text-sm font-medium">
-                  Select User
+                  {t.selectUser}
                 </label>
                 <Select
                   disabled={isLoading}
@@ -276,7 +279,7 @@ const Transactions = () => {
                   onValueChange={setSelectedUserId}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a user" />
+                    <SelectValue placeholder={t.selectUser} />
                   </SelectTrigger>
                   <SelectContent>
                     {users.map(user => (
@@ -291,7 +294,7 @@ const Transactions = () => {
               {transactionMethod === 'manual' ? (
                 <div className="space-y-2">
                   <label htmlFor="transactionType" className="text-sm font-medium">
-                    Transaction Type
+                    {t.transactionType}
                   </label>
                   <Select
                     value={transactionType}
@@ -301,22 +304,22 @@ const Transactions = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="credit">Credit (Add Funds)</SelectItem>
-                      <SelectItem value="debit">Debit (Remove Funds)</SelectItem>
+                      <SelectItem value="credit">{t.creditAddFunds}</SelectItem>
+                      <SelectItem value="debit">{t.debitRemoveFunds}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               ) : (
                 <div className="space-y-2">
                   <label htmlFor="product" className="text-sm font-medium">
-                    Select Product
+                    {t.selectProduct}
                   </label>
                   <Select
                     value={selectedProductId}
                     onValueChange={setSelectedProductId}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a product" />
+                      <SelectValue placeholder={t.selectProduct} />
                     </SelectTrigger>
                     <SelectContent>
                       {products.map(product => (
@@ -336,7 +339,7 @@ const Transactions = () => {
             {transactionMethod === 'manual' && (
               <div className="space-y-2">
                 <label htmlFor="amount" className="text-sm font-medium">
-                  Amount (SYP)
+                  {t.amountSYP}
                 </label>
                 <Input
                   id="amount"
@@ -362,17 +365,17 @@ const Transactions = () => {
               {transactionMethod === 'product' ? (
                 <>
                   <Package size={16} className="mr-1" />
-                  Purchase Product
+                  {t.purchaseProduct}
                 </>
               ) : transactionType === 'credit' ? (
                 <>
                   <ArrowUpRight size={16} className="mr-1" />
-                  Process Credit
+                  {t.processCredit}
                 </>
               ) : (
                 <>
                   <ArrowDownRight size={16} className="mr-1" />
-                  Process Debit
+                  {t.processDebit}
                 </>
               )}
             </Button>
@@ -380,30 +383,30 @@ const Transactions = () => {
         </Card>
         
         <Card className="card-dashboard">
-          <h2 className="section-title">User Details</h2>
+          <h2 className="section-title">{t.userDetails}</h2>
           {selectedUser ? (
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-gray-500">Name</p>
+                <p className="text-sm text-gray-500">{t.name}</p>
                 <p className="font-medium">{selectedUser.name}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Matric Number</p>
+                <p className="text-sm text-gray-500">{t.matricNumber}</p>
                 <p className="font-medium">{selectedUser.matricNumber}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Card Number</p>
+                <p className="text-sm text-gray-500">{t.cardNumber}</p>
                 <p className="font-medium">{selectedUser.cardNumber}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Current Balance</p>
+                <p className="text-sm text-gray-500">{t.currentBalance}</p>
                 <p className="text-xl font-semibold text-nfc-blue">
                   {formatCurrency(selectedUser.balance)}
                 </p>
               </div>
               {amount > 0 && (
                 <div className="border-t pt-4">
-                  <p className="text-sm text-gray-500">Transaction Preview</p>
+                  <p className="text-sm text-gray-500">{t.transactionPreview}</p>
                   <div className="flex items-center gap-2">
                     <p className="text-lg">
                       {formatCurrency(selectedUser.balance)}
@@ -429,7 +432,7 @@ const Transactions = () => {
             </div>
           ) : (
             <div className="flex items-center justify-center h-40 text-gray-500">
-              Select a user to see details
+              {t.selectUser}
             </div>
           )}
         </Card>
@@ -437,7 +440,7 @@ const Transactions = () => {
       
       {transactionMethod === 'product' && (
         <Card className="card-dashboard mt-6">
-          <h2 className="section-title">Available Products</h2>
+          <h2 className="section-title">{t.availableProducts}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {products.map(product => (
               <Card 

@@ -4,6 +4,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   Pagination,
   PaginationContent,
@@ -144,6 +145,7 @@ const mockLogs: TransactionLog[] = [
 const ITEMS_PER_PAGE = 5;
 
 const TransactionLogs = () => {
+  const { t } = useLanguage();
   const [logs, setLogs] = useState<TransactionLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -202,13 +204,13 @@ const TransactionLogs = () => {
 
   return (
     <DashboardLayout>
-      <h1 className="text-3xl font-bold mb-6 text-nfc-blue">Transaction Logs</h1>
+      <h1 className="text-3xl font-bold mb-6 text-nfc-blue">{t.transactionLogs}</h1>
       
       <Card className="mb-6 p-4">
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search by user, matric number, card number, or transaction type..."
+            placeholder={t.searchByUser}
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -224,20 +226,20 @@ const TransactionLogs = () => {
           </div>
         ) : (
           <>
-            <h2 className="section-title">Transaction History ({filteredLogs.length})</h2>
+            <h2 className="section-title">{t.transactionHistory} ({filteredLogs.length})</h2>
             <div className="overflow-x-auto">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>User</th>
-                    <th>Matric Number</th>
-                    <th>Card Number</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Previous Balance</th>
-                    <th>Current Balance</th>
-                    <th>Timestamp</th>
+                    <th>{t.id}</th>
+                    <th>{t.user}</th>
+                    <th>{t.matricNumber}</th>
+                    <th>{t.cardNumber}</th>
+                    <th>{t.type}</th>
+                    <th>{t.amount}</th>
+                    <th>{t.previousBalance}</th>
+                    <th>{t.currentBalance}</th>
+                    <th>{t.timestamp}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -254,7 +256,7 @@ const TransactionLogs = () => {
                               ? 'bg-green-100 text-green-800' 
                               : 'bg-red-100 text-red-800'
                           }`}>
-                            {log.type}
+                            {log.type === 'credit' ? t.credit : t.debit}
                           </span>
                         </td>
                         <td>{formatCurrency(log.amount)}</td>
@@ -266,7 +268,7 @@ const TransactionLogs = () => {
                   ) : (
                     <tr>
                       <td colSpan={9} className="text-center py-6 text-gray-500">
-                        {searchTerm ? "No transactions match your search" : "No transactions found"}
+                        {searchTerm ? t.noTransactionsMatch : t.noTransactionsFound}
                       </td>
                     </tr>
                   )}

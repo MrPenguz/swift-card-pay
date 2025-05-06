@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { Plus, Search } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // TODO: Replace this mock data with actual database fetching when DB is implemented
 // Mock data for initial render - will only be used if localStorage is empty
@@ -28,6 +29,7 @@ interface User {
 }
 
 const Users = () => {
+  const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -64,7 +66,7 @@ const Users = () => {
         console.error('Error fetching users:', error);
         toast({
           title: "Error",
-          description: "Failed to load users",
+          description: t.failedToLoadUsers,
           variant: "destructive",
         });
       } finally {
@@ -73,7 +75,7 @@ const Users = () => {
     };
     
     fetchUsers();
-  }, [toast]);
+  }, [toast, t]);
   
   const handleNewUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -89,8 +91,8 @@ const Users = () => {
     // Validate inputs
     if (!newUser.name || !newUser.matricNumber || !newUser.cardNumber) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
+        title: t.validationError,
+        description: t.pleaseFillAllFields,
         variant: "destructive",
       });
       return;
@@ -127,14 +129,14 @@ const Users = () => {
       });
       
       toast({
-        title: "Success",
-        description: "User created successfully",
+        title: t.transactionSuccess,
+        description: t.userCreatedSuccess,
       });
     } catch (error) {
       console.error('Error creating user:', error);
       toast({
         title: "Error",
-        description: "Failed to create user",
+        description: t.failedToCreateUser,
         variant: "destructive",
       });
     }
@@ -156,22 +158,22 @@ const Users = () => {
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-nfc-blue">User Management</h1>
+        <h1 className="text-3xl font-bold text-nfc-blue">{t.userManagement}</h1>
         
         <Dialog>
           <DialogTrigger asChild>
             <Button className="bg-nfc-teal hover:bg-teal-600">
-              <Plus size={16} className="mr-1" /> Add User
+              <Plus size={16} className="mr-1" /> {t.addUser}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Create New User</DialogTitle>
+              <DialogTitle>{t.createNewUser}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleCreateUser} className="space-y-4 mt-4">
               <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium">
-                  Full Name
+                  {t.fullName}
                 </label>
                 <Input
                   id="name"
@@ -184,7 +186,7 @@ const Users = () => {
               
               <div className="space-y-2">
                 <label htmlFor="matricNumber" className="text-sm font-medium">
-                  Matric Number
+                  {t.matricNumber}
                 </label>
                 <Input
                   id="matricNumber"
@@ -198,7 +200,7 @@ const Users = () => {
               {/* TODO: In production, integrate with RFID reader to automatically populate this field */}
               <div className="space-y-2">
                 <label htmlFor="cardNumber" className="text-sm font-medium">
-                  Card Number
+                  {t.cardNumber}
                 </label>
                 <Input
                   id="cardNumber"
@@ -212,7 +214,7 @@ const Users = () => {
               {/* Added password field for user login */}
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium">
-                  Password
+                  {t.password}
                 </label>
                 <Input
                   id="password"
@@ -223,13 +225,13 @@ const Users = () => {
                   placeholder="Set user password"
                 />
                 <p className="text-xs text-gray-500">
-                  Note: By default, password will be same as matric number if left empty
+                  {t.passwordNote}
                 </p>
               </div>
               
               <div className="space-y-2">
                 <label htmlFor="initialBalance" className="text-sm font-medium">
-                  Initial Balance (SYP)
+                  {t.initialBalance}
                 </label>
                 <Input
                   id="initialBalance"
@@ -243,9 +245,9 @@ const Users = () => {
               
               <DialogFooter className="gap-2 sm:gap-0">
                 <DialogClose asChild>
-                  <Button type="button" variant="outline">Cancel</Button>
+                  <Button type="button" variant="outline">{t.cancel}</Button>
                 </DialogClose>
-                <Button type="submit" className="bg-nfc-blue hover:bg-blue-800">Create User</Button>
+                <Button type="submit" className="bg-nfc-blue hover:bg-blue-800">{t.save}</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -256,7 +258,7 @@ const Users = () => {
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Search users by name, matric number, or card number..."
+            placeholder={`${t.search}...`}
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -272,17 +274,17 @@ const Users = () => {
           </div>
         ) : (
           <>
-            <h2 className="section-title">Users ({filteredUsers.length})</h2>
+            <h2 className="section-title">{t.users} ({filteredUsers.length})</h2>
             <div className="overflow-x-auto">
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Matric Number</th>
-                    <th>Card Number</th>
-                    <th>Balance</th>
-                    <th>Created At</th>
+                    <th>{t.id}</th>
+                    <th>{t.name}</th>
+                    <th>{t.matricNumber}</th>
+                    <th>{t.cardNumber}</th>
+                    <th>{t.balance}</th>
+                    <th>{t.date}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -300,7 +302,7 @@ const Users = () => {
                   ) : (
                     <tr>
                       <td colSpan={6} className="text-center py-6 text-gray-500">
-                        {searchTerm ? "No users match your search" : "No users found"}
+                        {searchTerm ? t.noUsersMatchSearch : t.noUsersFound}
                       </td>
                     </tr>
                   )}
