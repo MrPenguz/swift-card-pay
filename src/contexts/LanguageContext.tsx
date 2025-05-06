@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Language = 'en' | 'ar';
@@ -139,10 +138,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   // Get translations for current language
   const t = translations[language];
 
-  // Update localStorage and document direction when language changes
+  // Update localStorage when language changes but don't change document direction
   useEffect(() => {
     localStorage.setItem('preferredLanguage', language);
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    // Remove the RTL direction setting to keep layout consistent
     document.documentElement.lang = language;
   }, [language]);
 

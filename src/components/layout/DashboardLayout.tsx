@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   LogOut, 
@@ -160,10 +159,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </div>
         </nav>
         
-        {/* Language toggle - improved styling for RTL/LTR compatibility */}
+        {/* Language toggle - improved styling for consistency across languages */}
         <div className="p-4 border-t border-b">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+            <div className="flex items-center space-x-2">
               <Languages size={18} />
               <Label htmlFor="dashboard-language-toggle" className="text-sm whitespace-nowrap">
                 {language === 'en' ? t.english : t.arabic}
