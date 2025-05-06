@@ -11,6 +11,7 @@ import Users from "./pages/Users";
 import Transactions from "./pages/Transactions";
 import TransactionLogs from "./pages/TransactionLogs";
 import NotFound from "./pages/NotFound";
+import AuthGuard from "./components/auth/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -22,14 +23,60 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public routes (don't require authentication) */}
             <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/logs" element={<TransactionLogs />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
+            <Route 
+              path="/login" 
+              element={
+                <AuthGuard requireAuth={false}>
+                  <Login />
+                </AuthGuard>
+              } 
+            />
+            
+            {/* Protected routes (require authentication) */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <AuthGuard>
+                  <Dashboard />
+                </AuthGuard>
+              } 
+            />
+            <Route 
+              path="/users" 
+              element={
+                <AuthGuard>
+                  <Users />
+                </AuthGuard>
+              } 
+            />
+            <Route 
+              path="/transactions" 
+              element={
+                <AuthGuard>
+                  <Transactions />
+                </AuthGuard>
+              } 
+            />
+            <Route 
+              path="/logs" 
+              element={
+                <AuthGuard>
+                  <TransactionLogs />
+                </AuthGuard>
+              } 
+            />
+            
+            {/* Catch-all route (404) */}
+            <Route 
+              path="*" 
+              element={
+                <AuthGuard>
+                  <NotFound />
+                </AuthGuard>
+              } 
+            />
           </Routes>
         </BrowserRouter>
       </LanguageProvider>

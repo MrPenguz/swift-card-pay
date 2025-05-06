@@ -3,13 +3,8 @@ import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 
 /**
- * Index component redirects to the login page or dashboard based on authentication status.
+ * Index component redirects based on authentication status.
  * This component serves as the entry point for the application.
- * 
- * TODO: When implementing database authentication:
- * - Check for existing valid session token
- * - Validate token with backend API
- * - Redirect to dashboard if authenticated or login if not
  */
 const Index = () => {
   // Set up language preferences if not already set
@@ -25,19 +20,27 @@ const Index = () => {
   }, []);
 
   // Check if user is already authenticated
-  const currentUser = localStorage.getItem('currentUser');
-  
-  // TODO: Replace this basic check with proper JWT validation when implementing actual authentication
-  if (currentUser) {
+  const isAuthenticated = () => {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) return false;
+    
     try {
       const user = JSON.parse(currentUser);
-      if (user.isAuthenticated) {
-        // Redirect admin to dashboard and regular users to their transaction logs
-        return <Navigate to={user.role === 'admin' ? '/dashboard' : '/logs'} replace />;
-      }
+      return user.isAuthenticated === true;
     } catch (error) {
-      // If JSON parsing fails, clear the invalid data
-      localStorage.removeItem('currentUser');
+      return false;
+    }
+  };
+  
+  // Determine where to redirect based on authentication status
+  if (isAuthenticated()) {
+    try {
+      const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      // Redirect admin to dashboard and regular users to their transaction logs
+      return <Navigate to={user.role === 'admin' ? '/dashboard' : '/logs'} replace />;
+    } catch (error) {
+      // If JSON parsing fails, redirect to login
+      return <Navigate to="/login" replace />;
     }
   }
   
