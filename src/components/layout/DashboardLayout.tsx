@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LogOut, 
   Home, 
@@ -43,21 +43,39 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string>('');
   const { language, setLanguage, t } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  useEffect(() => {
+    // Get user role from localStorage
+    try {
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        setUserRole(user.role || 'user');
+      }
+    } catch (error) {
+      console.error('Error getting user role:', error);
+    }
+  }, []);
   
   const handleLanguageToggle = () => {
     setLanguage(language === 'en' ? 'ar' : 'en');
   };
   
   const handleLogout = () => {
-    // In a real application, this would perform actual logout logic
+    // Remove user data from localStorage to log out
+    localStorage.removeItem('currentUser');
+    
     toast({
       title: "Logged out successfully",
       description: "You have been logged out of the system.",
     });
+    
+    // Redirect to login page after logout
     navigate('/login');
   };
   
@@ -90,33 +108,55 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           </h1>
         </div>
         
-        {/* Navigation links */}
+        {/* Navigation links based on user role */}
         <nav className="mt-6 px-3 flex-1">
           <div className="space-y-1">
-            <SidebarLink 
-              to="/dashboard" 
-              icon={Home} 
-              label={t.dashboard}
-              isActive={location.pathname === '/dashboard'} 
-            />
-            <SidebarLink 
-              to="/users" 
-              icon={Users} 
-              label={t.users}
-              isActive={location.pathname === '/users'} 
-            />
-            <SidebarLink 
-              to="/transactions" 
-              icon={CreditCard} 
-              label={t.transactions} 
-              isActive={location.pathname === '/transactions'} 
-            />
-            <SidebarLink 
-              to="/logs" 
-              icon={Calendar} 
-              label={t.logs} 
-              isActive={location.pathname === '/logs'} 
-            />
+            {userRole === 'admin' && (
+              <>
+                <SidebarLink 
+                  to="/dashboard" 
+                  icon={Home} 
+                  label={t.dashboard}
+                  isActive={location.pathname === '/dashboard'} 
+                />
+                <SidebarLink 
+                  to="/users" 
+                  icon={Users} 
+                  label={t.users}
+                  isActive={location.pathname === '/users'} 
+                />
+                <SidebarLink 
+                  to="/transactions" 
+                  icon={CreditCard} 
+                  label={t.transactions} 
+                  isActive={location.pathname === '/transactions'} 
+                />
+                <SidebarLink 
+                  to="/logs" 
+                  icon={Calendar} 
+                  label={t.logs} 
+                  isActive={location.pathname === '/logs'} 
+                />
+              </>
+            )}
+            
+            {userRole === 'student' && (
+              <SidebarLink 
+                to="/student-dashboard" 
+                icon={Home} 
+                label={t.dashboard}
+                isActive={location.pathname === '/student-dashboard'} 
+              />
+            )}
+            
+            {userRole === 'user' && (
+              <SidebarLink 
+                to="/logs" 
+                icon={Calendar} 
+                label={t.logs} 
+                isActive={location.pathname === '/logs'} 
+              />
+            )}
           </div>
         </nav>
         

@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -38,27 +38,19 @@ const App = () => (
               } 
             />
             
-            {/* Protected routes (require authentication) */}
+            {/* Admin only routes */}
             <Route 
               path="/dashboard" 
               element={
-                <AuthGuard>
+                <AuthGuard requireAuth={true} requiredRole="admin">
                   <Dashboard />
-                </AuthGuard>
-              } 
-            />
-            <Route 
-              path="/student-dashboard" 
-              element={
-                <AuthGuard>
-                  <StudentDashboard />
                 </AuthGuard>
               } 
             />
             <Route 
               path="/users" 
               element={
-                <AuthGuard>
+                <AuthGuard requireAuth={true} requiredRole="admin">
                   <Users />
                 </AuthGuard>
               } 
@@ -66,15 +58,27 @@ const App = () => (
             <Route 
               path="/transactions" 
               element={
-                <AuthGuard>
+                <AuthGuard requireAuth={true} requiredRole="admin">
                   <Transactions />
                 </AuthGuard>
               } 
             />
+            
+            {/* Student only routes */}
+            <Route 
+              path="/student-dashboard" 
+              element={
+                <AuthGuard requireAuth={true} requiredRole="student">
+                  <StudentDashboard />
+                </AuthGuard>
+              } 
+            />
+            
+            {/* Shared routes (accessible by all authenticated users) */}
             <Route 
               path="/logs" 
               element={
-                <AuthGuard>
+                <AuthGuard requireAuth={true} requiredRole={["admin", "user"]}>
                   <TransactionLogs />
                 </AuthGuard>
               } 
