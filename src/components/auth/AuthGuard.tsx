@@ -36,12 +36,25 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireAuth = true }) =
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  // If route is login and user is already authenticated, redirect to dashboard
+  // If route is login and user is already authenticated, redirect based on role
   if (!requireAuth && authenticated) {
     // Determine where to redirect based on user role
     try {
       const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-      const redirectPath = user.role === 'admin' ? '/dashboard' : '/logs';
+      let redirectPath;
+      
+      switch (user.role) {
+        case 'admin':
+          redirectPath = '/dashboard';
+          break;
+        case 'student':
+          redirectPath = '/student-dashboard';
+          break;
+        default:
+          redirectPath = '/logs';
+          break;
+      }
+      
       return <Navigate to={redirectPath} replace />;
     } catch (error) {
       // If there's an error, just redirect to dashboard as fallback

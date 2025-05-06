@@ -19,7 +19,7 @@ const loginTranslations = {
     password: 'Password',
     loginButton: 'Login',
     loggingIn: 'Logging in...',
-    demoCredentials: 'Demo credentials: admin / admin',
+    demoCredentials: 'Demo credentials: admin / admin or student / student',
     errorRequired: 'Username and password are required',
     loginSuccess: 'Login successful',
     welcomeMessage: 'Welcome to Swift Card Pay',
@@ -35,7 +35,7 @@ const loginTranslations = {
     password: 'كلمة المرور',
     loginButton: 'تسجيل الدخول',
     loggingIn: 'جاري تسجيل الدخول...',
-    demoCredentials: 'بيانات تجريبية: admin / admin',
+    demoCredentials: 'بيانات تجريبية: admin / admin أو student / student',
     errorRequired: 'اسم المستخدم وكلمة المرور مطلوبان',
     loginSuccess: 'تم تسجيل الدخول بنجاح',
     welcomeMessage: 'مرحبًا بك في سويفت كارد باي',
@@ -91,6 +91,19 @@ const Login = () => {
           isAuthenticated: true 
         }));
         navigate('/dashboard');
+      } else if (username === 'student' && password === 'student') {
+        toast({
+          title: t.loginSuccess,
+          description: t.welcomeMessage,
+        });
+        localStorage.setItem('currentUser', JSON.stringify({ 
+          username: 'student',
+          name: 'Student User',
+          balance: 500, 
+          role: 'student',
+          isAuthenticated: true 
+        }));
+        navigate('/student-dashboard');
       } else {
         // Check if this is a regular user login
         const users = JSON.parse(localStorage.getItem('appUsers') || '[]');

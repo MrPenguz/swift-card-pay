@@ -7,11 +7,13 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import StudentDashboard from "./pages/StudentDashboard";
 import Users from "./pages/Users";
 import Transactions from "./pages/Transactions";
 import TransactionLogs from "./pages/TransactionLogs";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./components/auth/AuthGuard";
+import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -23,8 +25,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Root route */}
+            <Route path="/" element={<Index />} />
+            
             {/* Public routes (don't require authentication) */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
             <Route 
               path="/login" 
               element={
@@ -40,6 +44,14 @@ const App = () => (
               element={
                 <AuthGuard>
                   <Dashboard />
+                </AuthGuard>
+              } 
+            />
+            <Route 
+              path="/student-dashboard" 
+              element={
+                <AuthGuard>
+                  <StudentDashboard />
                 </AuthGuard>
               } 
             />

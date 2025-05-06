@@ -36,8 +36,16 @@ const Index = () => {
   if (isAuthenticated()) {
     try {
       const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-      // Redirect admin to dashboard and regular users to their transaction logs
-      return <Navigate to={user.role === 'admin' ? '/dashboard' : '/logs'} replace />;
+      
+      // Redirect based on user role
+      switch (user.role) {
+        case 'admin':
+          return <Navigate to="/dashboard" replace />;
+        case 'student':
+          return <Navigate to="/student-dashboard" replace />;
+        default:
+          return <Navigate to="/logs" replace />;
+      }
     } catch (error) {
       // If JSON parsing fails, redirect to login
       return <Navigate to="/login" replace />;
