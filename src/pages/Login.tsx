@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
@@ -43,7 +42,7 @@ const loginTranslations = {
     invalidCredentials: 'اسم المستخدم أو كلمة المرور غير صالحة',
     loginError: 'خطأ في تسجيل الدخول',
     unexpectedError: 'حدث خطأ غير متوقع',
-  }
+  },
 };
 
 const Login = () => {
@@ -53,7 +52,7 @@ const Login = () => {
   const { language, setLanguage, t: globalT } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+
   // Get login-specific translations + global translations
   const t = { ...globalT, ...loginTranslations[language] };
 
@@ -63,78 +62,59 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate inputs
     if (!username || !password) {
       toast({
-        title: "Error",
+        title: 'Error',
         description: t.errorRequired,
-        variant: "destructive",
+        variant: 'destructive',
       });
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (username === 'admin' && password === 'admin') {
-        toast({
-          title: t.loginSuccess,
-          description: t.welcomeMessage,
-        });
-        localStorage.setItem('currentUser', JSON.stringify({ 
-          username: 'admin', 
-          role: 'admin',
-          isAuthenticated: true 
-        }));
-        navigate('/dashboard');
-      } else if (username === 'student' && password === 'student') {
-        toast({
-          title: t.loginSuccess,
-          description: t.welcomeMessage,
-        });
-        localStorage.setItem('currentUser', JSON.stringify({ 
-          username: 'student',
-          name: 'Student User',
-          balance: 500, 
-          role: 'student',
-          isAuthenticated: true 
-        }));
-        navigate('/student-dashboard');
-      } else {
-        // Check if this is a regular user login
-        const users = JSON.parse(localStorage.getItem('appUsers') || '[]');
-        const user = users.find((u: any) => u.matricNumber === username && username === password);
-        
-        if (user) {
-          toast({
-            title: t.loginSuccess,
-            description: t.welcomeMessage,
-          });
-          localStorage.setItem('currentUser', JSON.stringify({ 
-            username: user.matricNumber,
-            name: user.name,
-            userId: user.id,
-            role: 'user',
-            isAuthenticated: true 
-          }));
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || t.unexpectedError);
+      }
+
+      // Save token and user data
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('currentUser', JSON.stringify(data.user));
+
+      toast({
+        title: t.loginSuccess,
+        description: t.welcomeMessage,
+      });
+
+      // Redirect based on role
+      switch (data.user.role) {
+        case 'admin':
+          navigate('/dashboard');
+          break;
+        case 'student':
+          navigate('/student-dashboard');
+          break;
+        default:
           navigate('/logs');
-        } else {
-          toast({
-            title: t.loginFailed,
-            description: t.invalidCredentials,
-            variant: "destructive",
-          });
-        }
       }
     } catch (error) {
       toast({
-        title: t.loginError,
-        description: t.unexpectedError,
-        variant: "destructive",
+        title: t.loginFailed,
+        description: error.message || t.unexpectedError,
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -150,11 +130,14 @@ const Login = () => {
           </div>
           <h1 className="mt-4 text-2xl font-bold text-nfc-blue">{t.title}</h1>
           <p className="mt-2 text-gray-500">{t.subtitle}</p>
-          
+
           {/* Language toggle switch - fixed styling */}
           <div className="absolute top-4 right-4">
             <div className="flex items-center space-x-2">
-              <Label htmlFor="language-toggle" className="text-sm whitespace-nowrap">
+              <Label
+                htmlFor="language-toggle"
+                className="text-sm whitespace-nowrap"
+              >
                 {language === 'en' ? globalT.english : globalT.arabic}
               </Label>
               <Switch
@@ -166,7 +149,7 @@ const Login = () => {
             </div>
           </div>
         </div>
-        
+
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
             <label htmlFor="username" className="text-sm font-medium">
@@ -187,7 +170,7 @@ const Login = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
               {t.password}
@@ -207,16 +190,16 @@ const Login = () => {
               </div>
             </div>
           </div>
-          
-          <Button 
-            type="submit" 
-            className="w-full bg-nfc-blue hover:bg-blue-800" 
+
+          <Button
+            type="submit"
+            className="w-full bg-nfc-blue hover:bg-blue-800"
             disabled={isLoading}
           >
             {isLoading ? t.loggingIn : t.loginButton}
           </Button>
         </form>
-        
+
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>{t.demoCredentials}</p>
         </div>
